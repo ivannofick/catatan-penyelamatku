@@ -1,0 +1,42 @@
+Environment: M1 MPB, OSX 12.4
+
+Spent a full day on this and finally came to a solution that worked.
+
+Stop the service with brew services stop mysql@5.7
+
+Remove the launch agent file rm ~/Library/LaunchAgents/homebrew.mxcl.mysql@5.7.plist
+
+Unlink the service if it was linked brew unlink mysql@5.7
+
+Uninstall the service brew uninstall mysql@5.7
+
+Then I removed the mysql data directory, suggested above. This wasn't in the /usr/local/var/mysql on my machine, but rather /opt/homebrew/var/mysql
+
+So rm -rf /opt/homebrew/var/mysql
+
+This wasn't the last step for me. Reinstalling at this point gave me a bunch of errors and the brew post install steps failed. Most of the errors pointed to my my.cnf file. I found that removing this file before attempting to reinstall prevented those errors.
+
+I made a backup of this file just in case this caused more issues.
+
+cp /opt/homebrew/etc/my.cnf /opt/homebrew/etc/my.cnf.backup
+
+Then, rm /opt/homebrew/etc/my.cnf
+
+Note: this file may be in a different location on your machine.
+
+Ok, now do a fresh install.
+
+brew install mysql@5.7
+
+brew link mysql@5.7 --force
+
+If you link the package, you can add it to your path following the brew log suggestion. So add, export PATH="/opt/homebrew/opt/mysql@5.7/bin:$PATH" to your ~/.zshrc.
+
+Verify the service is available with brew services list or brew services.
+
+If you see mysql@5.7 there, go ahead and start it with brew services start mysql@5.7
+
+
+
+
+source : https://stackoverflow.com/questions/70447598/brew-start-and-brew-restart-wont-start-service
